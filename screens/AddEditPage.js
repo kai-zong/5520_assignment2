@@ -1,7 +1,10 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import InputList from '../components/InputList';
 import DateInput from '../components/DateInput';
+import PressableButton from '../components/PressableButton';
+import {getItems, addItem, updateItem, deleteItem} from '../firebaseSetup/firebaseHelper';
+import {color} from '../reusables';
 
 export default function AddEditPage({ navigation, route }) {
   const [inputList, setInputList] = useState([]);
@@ -11,6 +14,8 @@ export default function AddEditPage({ navigation, route }) {
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
   const [dietDate, setDietDate] = useState(null);
+  const [collectionName, setCollectionName] = useState('');
+  const [itemParams, setItemParams] = useState({});
 
   const header = route.params.header;
 
@@ -25,8 +30,9 @@ export default function AddEditPage({ navigation, route }) {
       const numericValue = text.replace(/[^0-9]/g, '');
       setter(numericValue);
     };
-
-    if (header === 'Add Activity') {
+    if (header === 'Add Activity') 
+        {
+            setCollectionName('activities');
       inputs = [
         {
           label: 'Activity',
@@ -48,13 +54,12 @@ export default function AddEditPage({ navigation, route }) {
             />
           ),
         },
-        {
-          label: 'Description',
-          onChange: (text) => setDescription(text),
-          value: description,
-        },
+    
       ];
-    } else if (header === 'Add Food') {
+      setItemParams({'Activity': activity, 'Duration': duration, 'Date': activityDate})
+    } else if (header === 'Add Food') 
+        {
+            setCollectionName('diet');
       inputs = [
         {
           label: 'Calories',
@@ -77,10 +82,31 @@ export default function AddEditPage({ navigation, route }) {
           value: description,
         },
       ];
+        setItemParams({'Calories': calories, 'Date': dietDate, 'Description': description})
     }
 
     setInputList(inputs);
   }, [navigation, header, activity, duration, activityDate, description, calories, dietDate]);
 
-  return <InputList inputs={inputList} />;
+  return (<View>
+    <InputList inputs={inputList} />
+    <View style={styles.buttonContainer}>
+    <PressableButton bgcolor={color.green} pressedFunction={()=>addItem(collectionName, itemParams)}>
+        <Text>Submit</Text>
+    </PressableButton>
+    <PressableButton bgcolor={color.red} pressedFunction={navigation.goBack}>
+        <Text>Cancel</Text>
+    </PressableButton>
+    </View>
+    </View>)
 }
+
+
+const styles = StyleSheet.create({
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 10,
+    }
+}
+);
