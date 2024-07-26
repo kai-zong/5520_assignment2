@@ -1,85 +1,43 @@
-import {db} from './firebaseConfig';
+import {db} from './firebaseSetup';
 
 import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
-export async function getActivities() {
-   try{
-        const querySnapshot = await getDocs(collection(db, "activities"));
-        const activities = [];
-        querySnapshot.forEach((doc) => {
-             activities.push({id: doc.id, ...doc.data()});
-        });
-        return activities;
-   }
-    catch(err){
-          console.error(err);
-    }
-}
-
-export async function addActivity(activity) {
+export async function getItems(collectionName) {
     try{
-         await addDoc(collection(db, "activities"), activity);
+          const querySnapshot = await getDocs(collection(db, collectionName));
+          const items = [];
+          querySnapshot.forEach((doc) => {
+                 items.push({id: doc.id, ...doc.data()});
+          });
+          return items;
     }
-    catch(err){
-          console.error(err);
-    }
+     catch(err){
+             console.error(err);
+     }
 }
 
-export async function updateActivity(activity) {
+export async function addItem(collectionName, item) {
     try{
-         const activityRef = doc(db, "activities", activity.id);
-         await updateDoc(activityRef, activity);
+         await addDoc(collection(db, collectionName), item);
     }
     catch(err){
           console.error(err);
     }
 }
 
-export async function deleteActivity(id) {
+export async function updateItem(collectionName, item) {
     try{
-         await deleteDoc(doc(db, "activities", id));
+         const itemRef = doc(db, collectionName, item.id);
+         await updateDoc(itemRef, item);
     }
     catch(err){
           console.error(err);
     }
 }
 
-export async function getDiets() {
-   try{
-        const querySnapshot = await getDocs(collection(db, "diets"));
-        const diets = [];
-        querySnapshot.forEach((doc) => {
-             diets.push({id: doc.id, ...doc.data()});
-        });
-        return diets;
-   }
-    catch(err){
-          console.error(err);
-    }
-}
-
-export async function addDiet(diet) {
+export async function deleteItem(collectionName, id) {
     try{
-         await addDoc(collection(db, "diets"), diet);
-    }
-    catch(err){
-          console.error(err);
-    }
-}
-
-export async function updateDiet(diet) {
-    try{
-         const dietRef = doc(db, "diets", diet.id);
-         await updateDoc(dietRef, diet);
-    }
-    catch(err){
-          console.error(err);
-    }
-}
-
-export async function deleteDiet(id) {
-    try{
-         await deleteDoc(doc(db, "diets", id));
+         await deleteDoc(doc(db, collectionName, id));
     }
     catch(err){
           console.error(err);
