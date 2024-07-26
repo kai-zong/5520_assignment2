@@ -1,17 +1,22 @@
-import { View, Text } from 'react-native'
+import { View, Text, SafeAreaView, ScrollView } from 'react-native'
 import { useEffect, useState } from 'react'
 import {useRoute} from '@react-navigation/native'
 import {getItems} from '../firebaseSetup/firebaseHelper'
+import ItemList from '../components/ItemList'
 
 export default function InfoPage({navigation}) {
-    const [collection, setCollection] = useState([]);
+    const [Items, setItems] = useState([]);
     route = useRoute();
     useEffect(() => {
-
+      getItems(route.name).then((items) => {
+        setItems(items);
+      });
     }, [])
   return (
-    <View>
+    <SafeAreaView>
+    <ScrollView>
       <Text>InfoPage</Text>
-    </View>
+    </ScrollView>
+    </SafeAreaView>
   )
 }

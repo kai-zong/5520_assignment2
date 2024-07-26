@@ -34,7 +34,6 @@ export default function App() {
         <Tab.Screen name="Diet" component={InfoPage} />
         <Tab.Screen name="Setting" component={Setting} />
       </Tab.Navigator>
-      <Text>Open up App.js to start working on your app!</Text>
       <StatusBar style="auto" />
     </NavigationContainer>
   );
