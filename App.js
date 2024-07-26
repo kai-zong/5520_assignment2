@@ -41,13 +41,13 @@ function Home() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={Home} options={{
           headerShown: false,
-        }}
-      >
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="addEdit" component={AddEditPage} />
+        }} />
+        <Stack.Screen name="addEdit" component={AddEditPage} options={({route}) => ({
+          headerTitleAlign: 'center',
+        })}/>
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
