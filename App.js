@@ -7,33 +7,44 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import InfoPage from './screens/InfoPage';
 import Setting from './screens/Setting';
 
-
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+function Home() {
+return(<Tab.Navigator initialRouteName='Activities'
+  screenOptions={({route}) => ({
+    headerTitleAlign: 'center',
+    tabBarIcon:({focused, color, size}) =>{
+      let iconName;
+
+      if(route.name === 'Activities'){
+        iconName = "running";
+    }
+    else if(route.name === 'Diet'){
+      iconName = "utensils"; 
+  }
+  else if(route.name === 'Setting'){
+    iconName = "cog";}
+  return <FontAwesome5 name={iconName} size={size} color={color} />;}
+
+})}>
+    <Tab.Screen name="Activities" component={InfoPage}/>
+    <Tab.Screen name="Diet" component={InfoPage} />
+    <Tab.Screen name="Setting" component={Setting} />
+  </Tab.Navigator>)
+  }
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator initialRouteName='Activities'
-      screenOptions={({route}) => ({
-        headerTitleAlign: 'center',
-        tabBarIcon:({focused, color, size}) =>{
-          let iconName;
-
-          if(route.name === 'Activities'){
-            iconName = "running";
-        }
-        else if(route.name === 'Diet'){
-          iconName = "utensils"; 
-      }
-      else if(route.name === 'Setting'){
-        iconName = "cog";}
-      return <FontAwesome5 name={iconName} size={size} color={color} />;}
-
-})}>
-        <Tab.Screen name="Activities" component={InfoPage}/>
-        <Tab.Screen name="Diet" component={InfoPage} />
-        <Tab.Screen name="Setting" component={Setting} />
-      </Tab.Navigator>
+      <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}>
+        <Stack.Screen name="Home" component={Home} />
+      
+      <Stack.Screen name="InfoPage" component={InfoPage} />
+      </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
   );

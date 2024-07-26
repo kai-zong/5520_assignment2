@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native'
 import React from 'react'
 
-export default function PressableButton({bgcolor, children}) {
+export default function PressableButton({bgcolor, pressedFunction, children}) {
   return (
     <View>
       <Pressable style={[styles.container, {backgroundColor: bgcolor}]}>

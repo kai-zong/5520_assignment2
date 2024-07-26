@@ -10,9 +10,12 @@ import { FontAwesome5 } from '@expo/vector-icons';
 
 export default function InfoPage({navigation}) {
     const [Items, setItems] = useState([]);
-    const route = useRoute();
+    const routeName = useRoute().name;
+    const pressedFunction = () => {
+
+    }
     useEffect(() => {
-      getItems(route.name).then((items) => {
+      getItems(routeName).then((items) => {
         setItems(items);
       });
 
@@ -20,10 +23,10 @@ export default function InfoPage({navigation}) {
         headerRight: ()=>{
           return(
             <View>
-              <PressableButton bgcolor='green'>
+              <PressableButton bgcolor='green' pressedFunction={()=>{}}>
               <AntDesign name="plus" size={24} color="black" />
-              {(route.name === 'Activities') && <FontAwesome5 name="running" size={24} color="black" />}
-              {(route.name === 'Diet') && <FontAwesome5 name="utensils" size={24} color="black" />}
+              {(routeName === 'Activities') && <FontAwesome5 name="running" size={24} color="black" />}
+              {(routeName === 'Diet') && <FontAwesome5 name="utensils" size={24} color="black" />}
 
               </PressableButton>
             </View>
