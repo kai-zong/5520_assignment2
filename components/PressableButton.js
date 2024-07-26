@@ -4,7 +4,7 @@ import React from 'react'
 export default function PressableButton({bgcolor, pressedFunction, children}) {
   return (
     <View>
-      <Pressable style={[styles.container, {backgroundColor: bgcolor}]}>
+      <Pressable style={[styles.container, {backgroundColor: bgcolor}]} onPress={pressedFunction}>
         {children.map((child, index) => <View key={index}>{child}</View>)}
       </Pressable>
     </View>
