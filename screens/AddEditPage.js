@@ -177,16 +177,33 @@ export default function AddEditPage({ navigation, route }) {
       { Activity: activity, Duration: duration, Date: Timestamp.fromDate(activityDate), Description: description, Special: isSpecial } :
       { Calories: calories, Date: Timestamp.fromDate(dietDate), Description: description, Special: isSpecial };
 
-    try {
-      if (!route.params.item) {
-        await addItem(collectionName, itemParams);
-      } else {
-        await updateItem(collectionName, { id: route.params.item.id, ...itemParams });
-      }
-      navigation.goBack(); // Navigate back to the previous screen
-    } catch (err) {
-      console.error(err);
-    }
+    Alert.alert(
+      'Confirmation',
+      'Do you want to proceed with the submission or go back to editing?',
+      [
+        {
+          text: 'Go Back',
+          onPress: () => console.log('User chose to go back'),
+          style: 'cancel',
+        },
+        {
+          text: 'Submit',
+          onPress: async () => {
+            try {
+              if (!route.params.item) {
+                await addItem(collectionName, itemParams);
+              } else {
+                await updateItem(collectionName, { id: route.params.item.id, ...itemParams });
+              }
+              navigation.goBack(); // Navigate back to the previous screen
+            } catch (err) {
+              console.error(err);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
