@@ -20,13 +20,13 @@ export default function DateInput({ value, onChange }) {
       <TextInput
         style={{ height: 40, borderColor: 'gray', borderWidth: 1, padding: 10 }}
         placeholder="Select Date"
-        value={value ? new Date(value.seconds * 1000).toLocaleDateString() : ''}
+        value={value ? value.toLocaleDateString() : ''}
         onFocus={showDatepicker}
         display="inline"
       />
       {show && (
         <DateTimePicker
-          value={value ? new Date(value.seconds * 1000) : new Date()}
+          value={value || new Date()}
           mode="date"
           display="default"
           onChange={onDateChange}

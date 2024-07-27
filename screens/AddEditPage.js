@@ -7,6 +7,7 @@ import PressableButton from '../components/PressableButton';
 import { addItem, updateItem } from '../firebaseSetup/firebaseHelper';
 import { color } from '../reusables';
 import Checkbox from 'expo-checkbox';
+import { Timestamp } from 'firebase/firestore';
 
 export default function AddEditPage({ navigation, route }) {
   const [activity, setActivity] = useState(route.params.item ? route.params.item.Activity : '');
@@ -37,7 +38,7 @@ export default function AddEditPage({ navigation, route }) {
   }, [navigation, header]);
 
   useEffect(() => {
-    if (header.includes('Activity')) {
+    if (header.includes('Activities') || header.includes('Activity')) {
       setCollectionName('activities');
     } else if (header.includes('Food') || header.includes('Diet')) {
       setCollectionName('diet');
@@ -49,84 +50,109 @@ export default function AddEditPage({ navigation, route }) {
     setter(numericValue);
   };
 
-  const inputList = header.includes('Activity') ? [
-    {
-      label: 'Activity',
-      component: (
-        <DropDownPicker
-          open={open}
-          value={activity}
-          items={activityItems}
-          setOpen={setOpen}
-          setValue={setActivity}
-          setItems={setActivityItems}
-          placeholder="Select an activity"
-          containerStyle={{ height: 40 }}
-          style={{ marginBottom: 10 }}
-          dropDownStyle={{ backgroundColor: '#fafafa' }}
-        />
-      ),
-    },
-    {
-      label: 'Duration (in minutes)',
-      onChange: handleNumericChange(setDuration),
-      value: duration,
-      keyboardType: 'numeric',
-    },
-    {
-      label: 'Date',
-      component: (
-        <DateInput
-          value={activityDate}
-          onChange={(date) => setActivityDate(date)}
-          onFocus={() => setOpen(false)} // Close dropdown when date picker opens
-        />
-      ),
-    },
-    {
-      label: 'Description',
-      onChange: (text) => setDescription(text),
-      value: description,
-    },
-  ] : [
-    {
-      label: 'Calories',
-      onChange: handleNumericChange(setCalories),
-      value: calories,
-      keyboardType: 'numeric',
-    },
-    {
-      label: 'Date',
-      component: (
-        <DateInput
-          value={dietDate}
-          onChange={(date) => setDietDate(date)}
-          onFocus={() => setOpen(false)} // Close dropdown when date picker opens
-        />
-      ),
-    },
-    {
-      label: 'Description',
-      onChange: (text) => setDescription(text),
-      value: description,
-    },
-  ];
+  const getInputList = () => {
+    console.log(header);
+    if (header.includes('Activities') || header.includes('Activity')) {
+      const inputs = [
+        {
+          label: 'Activity',
+          component: (
+            <DropDownPicker
+              open={open}
+              value={activity}
+              items={activityItems}
+              setOpen={setOpen}
+              setValue={setActivity}
+              setItems={setActivityItems}
+              placeholder="Select an activity"
+              containerStyle={{ height: 40 }}
+              style={{ marginBottom: 10 }}
+              dropDownStyle={{ backgroundColor: '#fafafa' }}
+            />
+          ),
+        },
+        {
+          label: 'Duration (in minutes)',
+          onChange: handleNumericChange(setDuration),
+          value: duration,
+          keyboardType: 'numeric',
+        },
+        {
+          label: 'Date',
+          component: (
+            <DateInput
+              value={activityDate}
+              onChange={(date) => setActivityDate(date)}
+              onFocus={() => setOpen(false)} // Close dropdown when date picker opens
+            />
+          ),
+        },
+        {
+          label: 'Description',
+          onChange: (text) => setDescription(text),
+          value: description,
+        },
+      ];
 
-  if (header.includes('Edit')) {
-    inputList.push({
-      label: 'This Item is marked as special. Select the box if you want to approve it',
-      component: (
-        <Checkbox
-          value={special}
-          onValueChange={setSpecial}
-        />
-      )
-    });
-  }
+      if (header.includes('Edit')) {
+        inputs.push({
+          label: 'This Item is marked as special. Select the box if you want to approve it',
+          component: (
+            <Checkbox
+              value={special}
+              onValueChange={setSpecial}
+            />
+          ),
+        });
+      }
+
+      return inputs;
+    } else if (header.includes('Food') || header.includes('Diet')) {
+      const inputs = [
+        {
+          label: 'Calories',
+          onChange: handleNumericChange(setCalories),
+          value: calories,
+          keyboardType: 'numeric',
+        },
+        {
+          label: 'Date',
+          component: (
+            <DateInput
+              value={dietDate}
+              onChange={(date) => setDietDate(date)}
+              onFocus={() => setOpen(false)} // Close dropdown when date picker opens
+            />
+          ),
+        },
+        {
+          label: 'Description',
+          onChange: (text) => setDescription(text),
+          value: description,
+        },
+      ];
+
+      if (header.includes('Edit')) {
+        inputs.push({
+          label: 'This Item is marked as special. Select the box if you want to approve it',
+          component: (
+            <Checkbox
+              value={special}
+              onValueChange={setSpecial}
+            />
+          ),
+        });
+      }
+
+      return inputs;
+      
+    }
+    return [];
+  };
 
   const handleSubmit = async () => {
     let isSpecial;
-    if (header.includes('Activity')) {
+    if (header.includes('Activities') || header.includes('Activity')) {
       if (!activity || !duration || !activityDate || !description) {
         Alert.alert('Error', 'Please fill out all fields.');
         return;
@@ -140,9 +166,9 @@ export default function AddEditPage({ navigation, route }) {
       isSpecial = parseInt(calories) >= 800;
     }
 
-    const itemParams = header.includes('Activity') ? 
-      { Activity: activity, Duration: duration, Date: activityDate, Description: description, Special: isSpecial } : 
-      { Calories: calories, Date: dietDate, Description: description, Special: isSpecial };
+    const itemParams = header.includes('Activities') || header.includes('Activity') ?
+      { Activity: activity, Duration: duration, Date: Timestamp.fromDate(activityDate), Description: description, Special: isSpecial } :
+      { Calories: calories, Date: Timestamp.fromDate(dietDate), Description: description, Special: isSpecial };
 
     try {
       if (!route.params.item) {
@@ -158,7 +184,7 @@ export default function AddEditPage({ navigation, route }) {
 
   return (
     <View>
-      <InputList inputs={inputList} />
+      <InputList inputs={getInputList()} />
       <View style={styles.buttonContainer}>
         <PressableButton bgcolor={color.green} pressedFunction={handleSubmit}>
           <Text>Submit</Text>
