@@ -18,6 +18,7 @@ export default function AddEditPage({ navigation, route }) {
   const [collectionName, setCollectionName] = useState('');
   const [itemParams, setItemParams] = useState({});
   const [open, setOpen] = useState(false);
+  const [special , setSpecial] = useState(false);
   const [activityItems, setActivityItems] = useState([
     { label: 'Running', value: 'running' },
     { label: 'Cycling', value: 'cycling' },
@@ -119,14 +120,15 @@ export default function AddEditPage({ navigation, route }) {
 
   useEffect(() => {
     if (header === 'Add Activity') {
-      setItemParams({ Activity: activity, Duration: duration, Date: activityDate, Description: description });
+      setItemParams({ Activity: activity, Duration: duration, Date: activityDate, Description: description, Special: special });
     } else if (header === 'Add Food') {
       setItemParams({ Calories: calories, Date: dietDate, Description: description });
     }
   }, [activity, duration, activityDate, description, calories, dietDate, header]);
 
   const handleSubmit = async () => {
-    if (header === 'Add Activity') {
+    setSpecial(activity === 'running' || activity === 'weights') && (duration >= 60);
+  if (header === 'Add Activity') {
       if (!activity || !duration || !activityDate || !description) {
         Alert.alert('Error', 'Please fill out all fields.');
         return;
