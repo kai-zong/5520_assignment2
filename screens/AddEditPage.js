@@ -1,13 +1,14 @@
-import React, { useLayoutEffect, useState, useEffect } from 'react';
+import React, { useLayoutEffect, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import InputList from '../components/InputList';
 import DateInput from '../components/DateInput';
 import PressableButton from '../components/PressableButton';
-import { addItem, updateItem } from '../firebaseSetup/firebaseHelper';
+import { addItem, updateItem, deleteItem } from '../firebaseSetup/firebaseHelper'; // Ensure deleteItem is imported
 import { color } from '../reusables';
 import Checkbox from 'expo-checkbox';
 import { Timestamp } from 'firebase/firestore';
+import { FontAwesome } from '@expo/vector-icons'; // Ensure FontAwesome is imported
 
 export default function AddEditPage({ navigation, route }) {
   const [activity, setActivity] = useState(route.params.item ? route.params.item.Activity : '');
@@ -29,20 +30,32 @@ export default function AddEditPage({ navigation, route }) {
     { label: 'Hiking', value: 'hiking' }
   ]);
 
+  const collectionNameRef = useRef('');
+
   const header = route.params.header;
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: header,
+      headerRight: () => header.includes('Edit') ? (
+        <PressableButton
+          pressedFunction={() => handleDelete()}
+        >
+          <FontAwesome name="trash-o" size={24} color="black" />
+        </PressableButton>
+      ) : null
     });
   }, [navigation, header]);
 
   useEffect(() => {
+    let name = '';
     if (header.includes('Activities') || header.includes('Activity')) {
-      setCollectionName('activities');
+      name = 'activities';
     } else if (header.includes('Food') || header.includes('Diet')) {
-      setCollectionName('diet');
+      name = 'diet';
     }
+    setCollectionName(name);
+    collectionNameRef.current = name;
   }, [header]);
 
   const handleNumericChange = (setter) => (text) => {
@@ -51,7 +64,6 @@ export default function AddEditPage({ navigation, route }) {
   };
 
   const getInputList = () => {
-    console.log(header);
     if (header.includes('Activities') || header.includes('Activity')) {
       const inputs = [
         {
@@ -145,9 +157,40 @@ export default function AddEditPage({ navigation, route }) {
       }
 
       return inputs;
-      
     }
     return [];
+  };
+
+  const handleDelete = async () => {
+    if (!collectionNameRef.current || !route.params.item.id) {
+      console.error('Collection name or item ID is missing');
+      return;
+    }
+
+    Alert.alert(
+      'Delete Confirmation',
+      'Are you sure you want to delete this item?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Delete cancelled'),
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              await deleteItem(collectionNameRef.current, route.params.item.id);
+              navigation.goBack(); // Navigate back to the previous screen
+            } catch (err) {
+              console.error(err);
+            }
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const handleSubmit = async () => {
@@ -191,9 +234,9 @@ export default function AddEditPage({ navigation, route }) {
           onPress: async () => {
             try {
               if (!route.params.item) {
-                await addItem(collectionName, itemParams);
+                await addItem(collectionNameRef.current, itemParams);
               } else {
-                await updateItem(collectionName, { id: route.params.item.id, ...itemParams });
+                await updateItem(collectionNameRef.current, { id: route.params.item.id, ...itemParams });
               }
               navigation.goBack(); // Navigate back to the previous screen
             } catch (err) {
