@@ -78,10 +78,12 @@ export default function AddEditPage({ navigation, route }) {
               setValue={setActivity}
               setItems={setActivityItems}
               containerStyle={{ height: 40, marginBottom: 20 }}
-          style={{ backgroundColor: "white" }}
-          dropDownContainerStyle={{ backgroundColor: "white" }}
-          labelStyle={{ color: "black" }}
-          placeholder="Select an activity"
+              style={{ backgroundColor: "white" }}
+              dropDownContainerStyle={{ backgroundColor: "white" }}
+              labelStyle={{ color: "black" }}
+              placeholder="Select an activity"
+              zIndex={3000}
+              zIndexInverse={1000}
             />
           ),
         },
