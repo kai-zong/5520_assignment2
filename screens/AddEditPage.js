@@ -151,19 +151,26 @@ export default function AddEditPage({ navigation, route }) {
   };
 
   const handleSubmit = async () => {
-    let isSpecial;
+    let isSpecial = special; // Initialize isSpecial with the special state
+
     if (header.includes('Activities') || header.includes('Activity')) {
       if (!activity || !duration || !activityDate || !description) {
         Alert.alert('Error', 'Please fill out all fields.');
         return;
       }
-      isSpecial = (activity === 'running' || activity === 'weights') && (parseInt(duration) >= 60);
+      // Only set isSpecial if adding a new item
+      if (!route.params.item) {
+        isSpecial = (activity === 'running' || activity === 'weights') && (parseInt(duration) >= 60);
+      }
     } else if (header.includes('Food') || header.includes('Diet')) {
       if (!calories || !dietDate || !description) {
         Alert.alert('Error', 'Please fill out all fields.');
         return;
       }
-      isSpecial = parseInt(calories) >= 800;
+      // Only set isSpecial if adding a new item
+      if (!route.params.item) {
+        isSpecial = parseInt(calories) >= 800;
+      }
     }
 
     const itemParams = header.includes('Activities') || header.includes('Activity') ?
