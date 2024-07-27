@@ -10,3 +10,16 @@ export const color = {
     "purple": "#800080",
 
 }
+
+export const lightTheme = {
+    backgroundColor: '#fff',
+    textColor: '#000',
+    buttonColor: '#ddd',
+  };
+  
+  export const darkTheme = {
+    backgroundColor: '#333',
+    textColor: '#fff',
+    buttonColor: '#555',
+  };
+  
