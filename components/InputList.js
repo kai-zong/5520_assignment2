@@ -5,7 +5,7 @@ export default function InputList({ inputs }) {
   return (
     <View>
       {inputs.map((input, index) => (
-        <View key={index} style={{ marginBottom: 10 }}>
+        <View key={index}>
           <Text>{input.label}</Text>
           {input.component || (
             <TextInput
