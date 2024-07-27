@@ -1,4 +1,4 @@
-import { View, SafeAreaView } from 'react-native';
+import { View, SafeAreaView, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useRoute } from '@react-navigation/native';
 import { collection, onSnapshot } from 'firebase/firestore';
@@ -7,11 +7,13 @@ import PressableButton from '../components/PressableButton';
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import ItemList from '../components/ItemList';
+import { useTheme } from '../ThemeContext';
 
 export default function InfoPage({ navigation }) {
   const [items, setItems] = useState([]);
   const routeName = useRoute().name;
   const addHeader = routeName === 'Activities' ? 'Add Activity' : 'Add Food';
+  const { backgroundColor } = useTheme();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, routeName.toLowerCase()), (snapshot) => {
@@ -42,8 +44,15 @@ export default function InfoPage({ navigation }) {
   }, [routeName, navigation]);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={[styles.container, { backgroundColor: backgroundColor }]}>
       <ItemList items={items} navigation={navigation} />
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+});

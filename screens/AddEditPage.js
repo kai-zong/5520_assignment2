@@ -4,11 +4,12 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import InputList from '../components/InputList';
 import DateInput from '../components/DateInput';
 import PressableButton from '../components/PressableButton';
-import { addItem, updateItem, deleteItem } from '../firebaseSetup/firebaseHelper'; // Ensure deleteItem is imported
+import { addItem, updateItem, deleteItem } from '../firebaseSetup/firebaseHelper';
 import { color } from '../reusables';
 import Checkbox from 'expo-checkbox';
 import { Timestamp } from 'firebase/firestore';
-import { FontAwesome } from '@expo/vector-icons'; // Ensure FontAwesome is imported
+import { FontAwesome } from '@expo/vector-icons';
+import { useTheme } from '../ThemeContext';
 
 export default function AddEditPage({ navigation, route }) {
   const [activity, setActivity] = useState(route.params.item ? route.params.item.Activity : '');
@@ -29,7 +30,7 @@ export default function AddEditPage({ navigation, route }) {
     { label: 'Yoga', value: 'yoga' },
     { label: 'Hiking', value: 'hiking' }
   ]);
-
+  const { backgroundColor } = useTheme();
   const collectionNameRef = useRef('');
 
   const header = route.params.header;
@@ -250,7 +251,7 @@ export default function AddEditPage({ navigation, route }) {
   };
 
   return (
-    <View>
+    <View style={[styles.container, { backgroundColor: backgroundColor }]}>
       <InputList inputs={getInputList()} />
       <View style={styles.buttonContainer}>
         <PressableButton bgcolor={color.green} pressedFunction={handleSubmit}>
@@ -265,6 +266,10 @@ export default function AddEditPage({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
