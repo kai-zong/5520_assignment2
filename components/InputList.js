@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Platform } from 'react-native';
 
 const InputList = ({ inputs }) => {
   return (
     <View>
       {inputs.map((input, index) => {
         if (input.component) {
+          const zValue =  Platform.OS === 'ios'
           return (
-            <View key={index} style={[styles.inputContainer, { zIndex: 1000 - index }]}>
+            <View key={index} style={[styles.inputContainer, zValue && { zIndex: 1000-index }]}>
               <Text style={styles.label}>{input.label}</Text>
               {input.component}
             </View>
