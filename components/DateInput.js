@@ -28,7 +28,7 @@ export default function DateInput({ value, onChange }) {
         <DateTimePicker
           value={value || new Date()}
           mode="date"
-          display="default"
+          display="inline"
           onChange={onDateChange}
         />
       )}
