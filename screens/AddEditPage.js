@@ -4,21 +4,20 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import InputList from '../components/InputList';
 import DateInput from '../components/DateInput';
 import PressableButton from '../components/PressableButton';
-import { addItem } from '../firebaseSetup/firebaseHelper';
+import { addItem, updateItem } from '../firebaseSetup/firebaseHelper';
 import { color } from '../reusables';
+import Checkbox from 'expo-checkbox';
 
 export default function AddEditPage({ navigation, route }) {
-  const [inputList, setInputList] = useState([]);
-  const [activity, setActivity] = useState('');
-  const [duration, setDuration] = useState('');
-  const [activityDate, setActivityDate] = useState(null);
-  const [description, setDescription] = useState('');
-  const [calories, setCalories] = useState('');
-  const [dietDate, setDietDate] = useState(null);
+  const [activity, setActivity] = useState(route.params.item ? route.params.item.Activity : '');
+  const [duration, setDuration] = useState(route.params.item ? route.params.item.Duration : '');
+  const [activityDate, setActivityDate] = useState(route.params.item ? new Date(route.params.item.Date.seconds * 1000) : null);
+  const [description, setDescription] = useState(route.params.item ? route.params.item.Description : '');
+  const [calories, setCalories] = useState(route.params.item ? route.params.item.Calories : '');
+  const [dietDate, setDietDate] = useState(route.params.item ? new Date(route.params.item.Date.seconds * 1000) : null);
   const [collectionName, setCollectionName] = useState('');
-  const [itemParams, setItemParams] = useState({});
   const [open, setOpen] = useState(false);
-  const [special , setSpecial] = useState(false);
+  const [special, setSpecial] = useState(route.params.item ? route.params.item.Special : false);
   const [activityItems, setActivityItems] = useState([
     { label: 'Running', value: 'running' },
     { label: 'Cycling', value: 'cycling' },
@@ -35,113 +34,122 @@ export default function AddEditPage({ navigation, route }) {
     navigation.setOptions({
       title: header,
     });
-
-    let inputs = [];
-
-    const handleNumericChange = (setter) => (text) => {
-      const numericValue = text.replace(/[^0-9]/g, '');
-      setter(numericValue);
-    };
-
-    if (header === 'Add Activity') {
-      setCollectionName('activities');
-      inputs = [
-        {
-          label: 'Activity',
-          component: (
-            <DropDownPicker
-              open={open}
-              value={activity}
-              items={activityItems}
-              setOpen={setOpen}
-              setValue={setActivity}
-              setItems={setActivityItems}
-              placeholder="Select an activity"
-              containerStyle={{ height: 40 }}
-              style={{ marginBottom: 10 }}
-              dropDownStyle={{ backgroundColor: '#fafafa' }}
-               // Close date picker when dropdown opens
-            />
-          ),
-        },
-        {
-          label: 'Duration (in minutes)',
-          onChange: handleNumericChange(setDuration),
-          value: duration,
-          keyboardType: 'numeric',
-        },
-        {
-          label: 'Date',
-          component: (
-            <DateInput
-              value={activityDate}
-              onChange={(date) => setActivityDate(date)}
-              onFocus={() => setOpen(false)} // Close dropdown when date picker opens
-            />
-          ),
-        },
-        {
-          label: 'Description',
-          onChange: (text) => setDescription(text),
-          value: description,
-        },
-      ];
-      setItemParams({ Activity: activity, Duration: duration, Date: activityDate, Description: description });
-    } else if (header === 'Add Food') {
-      setCollectionName('diet');
-      inputs = [
-        {
-          label: 'Calories',
-          onChange: handleNumericChange(setCalories),
-          value: calories,
-          keyboardType: 'numeric',
-        },
-        {
-          label: 'Date',
-          component: (
-            <DateInput
-              value={dietDate}
-              onChange={(date) => setDietDate(date)}
-              onFocus={() => setOpen(false)} // Close dropdown when date picker opens
-            />
-          ),
-        },
-        {
-          label: 'Description',
-          onChange: (text) => setDescription(text),
-          value: description,
-        },
-      ];
-      setItemParams({ Calories: calories, Date: dietDate, Description: description });
-    }
-
-    setInputList(inputs);
-  }, [navigation, header, activity, duration, activityDate, description, calories, dietDate, open]);
+  }, [navigation, header]);
 
   useEffect(() => {
-    if (header === 'Add Activity') {
-      setItemParams({ Activity: activity, Duration: duration, Date: activityDate, Description: description, Special: special });
-    } else if (header === 'Add Food') {
-      setItemParams({ Calories: calories, Date: dietDate, Description: description });
+    if (header.includes('Activity')) {
+      setCollectionName('activities');
+    } else if (header.includes('Food') || header.includes('Diet')) {
+      setCollectionName('diet');
     }
-  }, [activity, duration, activityDate, description, calories, dietDate, header]);
+  }, [header]);
+
+  const handleNumericChange = (setter) => (text) => {
+    const numericValue = text.replace(/[^0-9]/g, '');
+    setter(numericValue);
+  };
+
+  const inputList = header.includes('Activity') ? [
+    {
+      label: 'Activity',
+      component: (
+        <DropDownPicker
+          open={open}
+          value={activity}
+          items={activityItems}
+          setOpen={setOpen}
+          setValue={setActivity}
+          setItems={setActivityItems}
+          placeholder="Select an activity"
+          containerStyle={{ height: 40 }}
+          style={{ marginBottom: 10 }}
+          dropDownStyle={{ backgroundColor: '#fafafa' }}
+        />
+      ),
+    },
+    {
+      label: 'Duration (in minutes)',
+      onChange: handleNumericChange(setDuration),
+      value: duration,
+      keyboardType: 'numeric',
+    },
+    {
+      label: 'Date',
+      component: (
+        <DateInput
+          value={activityDate}
+          onChange={(date) => setActivityDate(date)}
+          onFocus={() => setOpen(false)} // Close dropdown when date picker opens
+        />
+      ),
+    },
+    {
+      label: 'Description',
+      onChange: (text) => setDescription(text),
+      value: description,
+    },
+  ] : [
+    {
+      label: 'Calories',
+      onChange: handleNumericChange(setCalories),
+      value: calories,
+      keyboardType: 'numeric',
+    },
+    {
+      label: 'Date',
+      component: (
+        <DateInput
+          value={dietDate}
+          onChange={(date) => setDietDate(date)}
+          onFocus={() => setOpen(false)} // Close dropdown when date picker opens
+        />
+      ),
+    },
+    {
+      label: 'Description',
+      onChange: (text) => setDescription(text),
+      value: description,
+    },
+  ];
+
+  if (header.includes('Edit')) {
+    inputList.push({
+      label: 'This Item is marked as special. Select the box if you want to approve it',
+      component: (
+        <Checkbox
+          value={special}
+          onValueChange={setSpecial}
+        />
+      )
+    });
+  }
 
   const handleSubmit = async () => {
-    setSpecial(activity === 'running' || activity === 'weights') && (duration >= 60);
-  if (header === 'Add Activity') {
+    let isSpecial;
+    if (header.includes('Activity')) {
       if (!activity || !duration || !activityDate || !description) {
         Alert.alert('Error', 'Please fill out all fields.');
         return;
       }
-    } else if (header === 'Add Food') {
+      isSpecial = (activity === 'running' || activity === 'weights') && (parseInt(duration) >= 60);
+    } else if (header.includes('Food') || header.includes('Diet')) {
       if (!calories || !dietDate || !description) {
         Alert.alert('Error', 'Please fill out all fields.');
         return;
       }
+      isSpecial = parseInt(calories) >= 800;
     }
 
+    const itemParams = header.includes('Activity') ? 
+      { Activity: activity, Duration: duration, Date: activityDate, Description: description, Special: isSpecial } : 
+      { Calories: calories, Date: dietDate, Description: description, Special: isSpecial };
+
     try {
-      await addItem(collectionName, itemParams);
+      if (!route.params.item) {
+        await addItem(collectionName, itemParams);
+      } else {
+        await updateItem(collectionName, { id: route.params.item.id, ...itemParams });
+      }
       navigation.goBack(); // Navigate back to the previous screen
     } catch (err) {
       console.error(err);

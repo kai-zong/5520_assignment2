@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-export default function DateInput({ value, onChange, onFocus }) {
+export default function DateInput({ value, onChange }) {
   const [show, setShow] = useState(false);
 
   const onDateChange = (event, selectedDate) => {
@@ -13,9 +13,6 @@ export default function DateInput({ value, onChange, onFocus }) {
 
   const showDatepicker = () => {
     setShow(true);
-    if (onFocus) {
-      onFocus();
-    }
   };
 
   return (
@@ -23,14 +20,15 @@ export default function DateInput({ value, onChange, onFocus }) {
       <TextInput
         style={{ height: 40, borderColor: 'gray', borderWidth: 1, padding: 10 }}
         placeholder="Select Date"
-        value={value ? value.toLocaleDateString() : ''}
+        value={value ? new Date(value.seconds * 1000).toLocaleDateString() : ''}
         onFocus={showDatepicker}
+        display="inline"
       />
       {show && (
         <DateTimePicker
-          value={value || new Date()}
+          value={value ? new Date(value.seconds * 1000) : new Date()}
           mode="date"
-          display="inline"
+          display="default"
           onChange={onDateChange}
         />
       )}

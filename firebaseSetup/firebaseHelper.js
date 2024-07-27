@@ -25,6 +25,7 @@ export async function addItem(collectionName, item) {
     }
 }
 
+
 export async function updateItem(collectionName, item) {
     try{
          const itemRef = doc(db, collectionName, item.id);

@@ -32,7 +32,7 @@ function Home() {
       })}
     >
       <Tab.Screen name="Activities" component={InfoPage} />
-      <Tab.Screen name="Diet" component={InfoPage} />
+      <Tab.Screen name="Diet" component={InfoPage}/>
       <Tab.Screen name="Setting" component={Setting} />
     </Tab.Navigator>
   )
@@ -45,9 +45,13 @@ export default function App() {
         <Stack.Screen name="Home" component={Home} options={{
           headerShown: false,
         }} />
-        <Stack.Screen name="addEdit" component={AddEditPage} options={({route}) => ({
+        <Stack.Screen name="Add" component={AddEditPage} options={({route}) => ({
           headerTitleAlign: 'center',
         })}/>
+        <Stack.Screen name="Edit" component={AddEditPage} options={({route}) => ({
+          headerTitleAlign: 'center',
+        })}/>
+
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
